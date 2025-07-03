@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta Interativa | BM&C News + Braskem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Corporate Calm -->
+    <!-- Application Structure Plan: A single-page application designed as an interactive decision-making tool. The structure guides the user from the high-level strategic vision down to a detailed, interactive comparison of the three proposal tiers. It starts with the project's 'why' (Desafio/Solução), explains the 'how' (4 Estratégias), and focuses on the 'what' (Plano Interativo). This interactive core allows users to toggle between plans, instantly updating a comparison chart, a list of deliverables, and the total investment. This is more persuasive than a static table, enabling clients to visually grasp the value proposition of each tier. The flow concludes with a timeline and a clear call to action, transforming a document into an engaging experience. -->
+    <!-- Visualization & Content Choices: Report Info: Three proposal tiers with varying deliverables and costs. -> Goal: Compare. -> Viz/Presentation: Interactive toggle buttons to select a plan, a dynamic bar chart (Chart.js) to visually compare the "volume" of deliverables across the four main strategies, and a dynamically updated list of deliverables and price. -> Interaction: User clicks a plan button, which triggers a JS function to update the chart data, deliverables list, and price display. -> Justification: This provides immediate, clear feedback on the differences between plans, aiding comprehension and decision-making far more effectively than a static table. The bar chart offers an at-a-glance summary of value. -> Library/Method: Vanilla JS for state management and DOM manipulation, Chart.js for canvas-based charting. The timeline is built with HTML/Tailwind for a clean, visual representation of the project's schedule. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .plan-button.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px 0 rgb(0 119 255 / 39%);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 1.25rem;
+            bottom: -1.25rem;
+            width: 2px;
+            background-color: #e2e8f0; /* slate-200 */
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-point {
+            position: absolute;
+            left: 1rem;
+            top: 1.25rem;
+            transform: translateX(-50%);
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: white;
+            border: 2px solid #0284c7; /* sky-600 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-16">
+
+        <!-- Header Section -->
+        <header class="text-center mb-16 md:mb-24">
+            <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-2">Proposta de Projeto Editorial</h1>
+            <p class="text-xl md:text-2xl font-semibold text-sky-600">BM&C News + Braskem</p>
+            <p class="mt-4 text-slate-600 max-w-3xl mx-auto">Uma jornada de conteúdo para consolidar a Braskem como líder em sustentabilidade rumo à COP30.</p>
+        </header>
+
+        <!-- The Opportunity Section -->
+        <section class="mb-16 md:mb-24">
+             <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold text-slate-900">A Oportunidade: Liderar a Conversa</h2>
+                <p class="mt-3 text-slate-600 max-w-3xl mx-auto">
+                    Esta seção detalha a visão estratégica do projeto. Em um momento crucial para o debate climático, o objetivo não é apenas anunciar, mas posicionar a Braskem como a principal autoridade em economia circular e inovação sustentável, pautando o mercado pela força de suas ideias e lideranças.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-sky-700 mb-3">O Desafio</h3>
+                    <p class="text-slate-600">Com a COP30 no Brasil, o desafio é transcender a comunicação tradicional. É preciso posicionar a Braskem de forma orgânica e institucional, influenciando o debate sem a necessidade de um patrocínio direto, mas com a autoridade de quem lidera a pauta.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-teal-600 mb-3">A Solução</h3>
+                    <p class="text-slate-600">Propomos uma narrativa editorial de 4 meses na BM&C News, onde a Braskem protagoniza a pauta de sustentabilidade. Através da presença constante de seus porta-vozes, construiremos uma percepção de liderança setorial sólida e incontestável.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Strategies Section -->
+        <section class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold text-slate-900">Nossas 4 Estratégias Editoriais</h2>
+                <p class="mt-3 text-slate-600 max-w-3xl mx-auto">
+                    A nossa solução é implementada através de quatro pilares de conteúdo integrados, projetados para construir e solidificar a liderança da Braskem de forma consistente ao longo de quatro meses, culminando na cobertura da COP30.
+                </p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <div class="text-3xl font-bold text-sky-600 mb-2">1</div>
+                    <h3 class="font-bold mb-2">Presença na Bancada</h3>
+                    <p class="text-sm text-slate-600">Porta-vozes da Braskem como comentaristas nos principais debates sobre ESG e sustentabilidade.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <div class="text-3xl font-bold text-sky-600 mb-2">2</div>
+                    <h3 class="font-bold mb-2">Conteúdo Aprofundado</h3>
+                    <p class="text-sm text-slate-600">Programa "BM&C Sustentabilidade" para explorar temas de interesse da Braskem com matérias exclusivas.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <div class="text-3xl font-bold text-sky-600 mb-2">3</div>
+                    <h3 class="font-bold mb-2">Liderança em Eventos</h3>
+                    <p class="text-sm text-slate-600">Cobertura jornalística de destaque para a participação da Braskem em eventos setoriais pré-COP30.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <div class="text-3xl font-bold text-sky-600 mb-2">4</div>
+                    <h3 class="font-bold mb-2">Coroamento na COP30</h3>
+                    <p class="text-sm text-slate-600">Posicionamento central da Braskem na cobertura da COP30, diretamente de Belém.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Proposal Section -->
+        <section id="interactive-plan" class="mb-16 md:mb-24 bg-white p-6 md:p-10 rounded-2xl shadow-lg border border-slate-200">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold text-slate-900">Explore os Planos de Investimento</h2>
+                <p class="mt-3 text-slate-600 max-w-3xl mx-auto">
+                    Selecione uma das propostas abaixo para visualizar os detalhes, comparar o volume de entregáveis no gráfico e ver o investimento correspondente. Esta ferramenta interativa foi criada para ajudar na sua decisão.
+                </p>
+            </div>
+
+            <div class="flex justify-center flex-wrap gap-4 mb-8">
+                <button id="btn-completa" class="plan-button text-lg font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-md">Completa</button>
+                <button id="btn-media" class="plan-button text-lg font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-md">Média</button>
+                <button id="btn-minima" class="plan-button text-lg font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-md">Mínima</button>
+            </div>
+
+            <div class="grid lg:grid-cols-5 gap-8 items-start">
+                <div class="lg:col-span-3">
+                    <div class="chart-container">
+                        <canvas id="proposalChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2">
+                    <div class="bg-slate-100 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-1">Proposta <span id="plan-name"></span></h3>
+                        <p class="text-3xl font-black text-sky-600 mb-4" id="plan-price"></p>
+                        <div class="space-y-3" id="plan-deliverables">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Timeline Section -->
+        <section class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold text-slate-900">Cronograma Estratégico (4 Meses)</h2>
+                <p class="mt-3 text-slate-600 max-w-3xl mx-auto">
+                    O projeto foi planejado para acontecer ao longo de quatro meses, construindo momentum e reforçando a mensagem de liderança da Braskem de forma progressiva até o principal evento, a COP30.
+                </p>
+            </div>
+            <div class="max-w-2xl mx-auto">
+                <div class="relative pl-8 space-y-8">
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <h3 class="font-bold text-lg">Agosto (Mês 1)</h3>
+                        <p class="text-slate-600">Início das participações na Bancada BM&C News e lançamento do programa BM&C Sustentabilidade com as primeiras matérias exclusivas.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <h3 class="font-bold text-lg">Setembro (Mês 2)</h3>
+                        <p class="text-slate-600">Continuidade da presença editorial e cobertura jornalística do evento setorial prévio à COP30 (se aplicável).</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <h3 class="font-bold text-lg">Outubro (Mês 3)</h3>
+                        <p class="text-slate-600">Intensificação da pauta "aquecimento COP30", com as últimas matérias e participações antes do evento principal.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <h3 class="font-bold text-lg">Novembro (Mês 4)</h3>
+                        <p class="text-slate-600">Cobertura especial da COP30 em Belém/PA, com presença estratégica dos porta-vozes da Braskem, coroando o projeto.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer/Next Steps -->
+        <footer class="text-center border-t border-slate-200 pt-12">
+             <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Próximos Passos</h2>
+             <p class="mt-3 text-slate-600 max-w-2xl mx-auto mb-6">Acreditamos que este projeto editorial é a maneira mais eficaz de posicionar a Braskem como uma voz líder na conversa sobre sustentabilidade. Gostaríamos de agendar uma reunião para discutir estas opções e customizar o plano que melhor atenda aos objetivos da companhia.</p>
+             <p class="text-sm text-slate-500">Equipe Comercial BM&C News | Proposta válida até 03 de agosto de 2025.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const proposals = {
+            completa: {
+                name: 'Completa',
+                price: 'R$ 1.350.000',
+                deliverables: [
+                    { item: 'Presença na Bancada', detail: '12 presenças' },
+                    { item: 'Programa Especial', detail: '6 matérias' },
+                    { item: 'Evento Prévio', detail: 'Cobertura inclusa' },
+                    { item: 'COP30: Presença Bancada', detail: '3 participações' },
+                    { item: 'COP30: Matérias', detail: '3 matérias exclusivas' },
+                    { item: 'COP30: Destaque', detail: 'Nível máximo' },
+                    { item: 'Distribuição Digital', detail: 'Inclusa' }
+                ],
+                chartData: [12, 6, 3, 9] 
+            },
+            media: {
+                name: 'Média',
+                price: 'R$ 750.000',
+                deliverables: [
+                    { item: 'Presença na Bancada', detail: '3 presenças' },
+                    { item: 'Programa Especial', detail: '3 matérias' },
+                    { item: 'Evento Prévio', detail: 'Cobertura inclusa' },
+                    { item: 'COP30: Presença Bancada', detail: '2 participações' },
+                    { item: 'COP30: Matérias', detail: '2 matérias exclusivas' },
+                    { item: 'COP30: Destaque', detail: 'Nível médio' },
+                    { item: 'Distribuição Digital', detail: 'Inclusa' }
+                ],
+                chartData: [3, 3, 2, 6]
+            },
+            minima: {
+                name: 'Mínima',
+                price: 'R$ 350.000',
+                deliverables: [
+                    { item: 'Presença na Bancada', detail: '3 presenças' },
+                    { item: 'Programa Especial', detail: '3 matérias (formato reduzido)' },
+                    { item: 'Evento Prévio', detail: 'Não incluso (adquirível à parte)' },
+                    { item: 'COP30: Presença Bancada', detail: '2 participações' },
+                    { item: 'COP30: Matérias', detail: '1 matéria exclusiva' },
+                    { item: 'COP30: Destaque', detail: 'Nível discreto' },
+                    { item: 'Distribuição Digital', detail: 'Inclusa' }
+                ],
+                chartData: [3, 2, 0, 4]
+            }
+        };
+        
+        const ctx = document.getElementById('proposalChart').getContext('2d');
+        let proposalChart;
+
+        function createChart(initialData) {
+            if (proposalChart) {
+                proposalChart.destroy();
+            }
+            proposalChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Bancada', 'Programa', 'Evento Prévio', 'COP30'],
+                    datasets: [{
+                        label: 'Volume de Entregáveis',
+                        data: initialData,
+                        backgroundColor: [
+                            'rgba(2, 132, 199, 0.6)', // sky-600
+                            'rgba(13, 148, 136, 0.6)', // teal-600
+                            'rgba(245, 158, 11, 0.6)', // amber-500
+                            'rgba(219, 39, 119, 0.6)' // fuchsia-600
+                        ],
+                        borderColor: [
+                            'rgba(2, 132, 199, 1)',
+                            'rgba(13, 148, 136, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(219, 39, 119, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#475569' // slate-600
+                            },
+                            grid: {
+                                color: '#e2e8f0' // slate-200
+                            }
+                        },
+                        x: {
+                             ticks: {
+                                color: '#475569'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: '#0f172a', // slate-900
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            padding: 12,
+                            cornerRadius: 6
+                        }
+                    }
+                }
+            });
+        }
+
+        const planNameEl = document.getElementById('plan-name');
+        const planPriceEl = document.getElementById('plan-price');
+        const planDeliverablesEl = document.getElementById('plan-deliverables');
+        const buttons = document.querySelectorAll('.plan-button');
+
+        function updateDisplay(planKey) {
+            const plan = proposals[planKey];
+
+            planNameEl.textContent = plan.name;
+            planPriceEl.textContent = plan.price;
+
+            planDeliverablesEl.innerHTML = '';
+            plan.deliverables.forEach(d => {
+                const deliverableDiv = document.createElement('div');
+                deliverableDiv.className = 'border-t border-slate-200 pt-3';
+                deliverableDiv.innerHTML = `
+                    <p class="font-semibold text-sm text-slate-700">${d.item}</p>
+                    <p class="text-sm text-slate-500">${d.detail}</p>
+                `;
+                planDeliverablesEl.appendChild(deliverableDiv);
+            });
+            
+            proposalChart.data.datasets[0].data = plan.chartData;
+            proposalChart.update();
+
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.id === `btn-${planKey}`) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createChart(proposals.completa.chartData);
+            updateDisplay('completa');
+            
+            document.getElementById('btn-completa').addEventListener('click', () => updateDisplay('completa'));
+            document.getElementById('btn-media').addEventListener('click', () => updateDisplay('media'));
+            document.getElementById('btn-minima').addEventListener('click', () => updateDisplay('minima'));
+        });
+    </script>
+</body>
+</html>
