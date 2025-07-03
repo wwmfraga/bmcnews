@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta Interativa: BM&C News + Think Construtora</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #4A4A4A;
+        }
+        .brand-primary { color: #3D5A80; }
+        .bg-brand-primary { background-color: #3D5A80; }
+        .bg-brand-accent { background-color: #98C1D9; }
+        .border-brand-accent { border-color: #98C1D9; }
+        .brand-accent-text { color: #98C1D9; }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #3D5A80;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #5a5a5a;
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+        }
+        .timeline-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .timeline-item.active {
+            background-color: #3D5A80;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .timeline-item.active .day-number {
+            color: #98C1D9;
+        }
+        .timeline-content {
+            transition: max-height 0.7s ease-in-out, opacity 0.5s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .timeline-content.show {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 400px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 400px;
+            max-height: 400px;
+        }
+        .icon-symbol {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm py-6">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold brand-primary">Proposta de Projeto Editorial</h1>
+            <p class="text-lg text-gray-600">BM&C News + Think Construtora</p>
+        </div>
+    </header>
+
+    <main>
+        <section id="strategy" class="py-16 md:py-24 text-center">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">A Estratégia</h2>
+                <p class="section-subtitle">
+                    Esta campanha foi desenhada para conectar o empreendimento Naara Higienópolis a um público qualificado através de uma narrativa de autoridade. Em uma semana, posicionamos Marcelo Nudelman como um especialista de referência e apresentamos o projeto como a materialização das tendências do mercado de luxo.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="icon-symbol brand-accent-text mb-4">🎯</div>
+                        <h3 class="text-xl font-bold brand-primary mb-2">Público-Alvo</h3>
+                        <p class="text-gray-600">O novo sênior de alta renda, um público que valoriza conteúdo de credibilidade e busca um estilo de vida exclusivo.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="icon-symbol brand-accent-text mb-4">💡</div>
+                        <h3 class="text-xl font-bold brand-primary mb-2">A Solução</h3>
+                        <p class="text-gray-600">Uma campanha editorial de 7 dias, que combina a credibilidade da TV com o alcance e a profundidade do digital.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="icon-symbol brand-accent-text mb-4">📈</div>
+                        <h3 class="text-xl font-bold brand-primary mb-2">O Objetivo</h3>
+                        <p class="text-gray-600">Gerar awareness e autoridade para o Naara Higienópolis, transformando interesse em consideração de investimento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="journey" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="section-title">A Jornada do Conteúdo</h2>
+                <p class="section-subtitle">
+                    Visualizamos a campanha como uma jornada de 7 dias, projetada para capturar a atenção e construir autoridade. Interaja com a linha do tempo abaixo para explorar as ações de cada dia.
+                </p>
+
+                <div id="timeline-controls" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                    <div data-day="1" class="timeline-item flex-1 p-4 rounded-lg shadow-md bg-gray-100 max-w-[200px] active">
+                        <div class="font-bold text-lg">Dia 1</div>
+                        <div class="text-sm day-number">Segunda</div>
+                    </div>
+                    <div data-day="2" class="timeline-item flex-1 p-4 rounded-lg shadow-md bg-gray-100 max-w-[200px]">
+                        <div class="font-bold text-lg">Dias 2-7</div>
+                        <div class="text-sm day-number">Terça a Dom</div>
+                    </div>
+                </div>
+
+                <div id="timeline-details" class="max-w-4xl mx-auto text-left">
+                    <div id="day-1-content" class="timeline-content show">
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                           <h3 class="font-bold text-xl brand-primary mb-4">Lançamento da Narrativa</h3>
+                           <ul class="space-y-4">
+                               <li class="flex items-start">
+                                   <span class="icon-symbol brand-accent-text mr-4 mt-1">📺</span>
+                                   <div>
+                                       <h4 class="font-semibold">Participação na Bancada</h4>
+                                       <p class="text-gray-600">Marcelo Nudelman participa ao vivo na bancada da BM&C News (até 7 min) para falar sobre o mercado imobiliário Triple A e a tendência do "senior living".</p>
+                                   </div>
+                               </li>
+                               <li class="flex items-start">
+                                   <span class="icon-symbol brand-accent-text mr-4 mt-1">📰</span>
+                                   <div>
+                                       <h4 class="font-semibold">Publicação da Matéria</h4>
+                                       <p class="text-gray-600">À tarde, uma matéria completa é publicada no portal da BM&C, aprofundando o tema, os comentários e apresentando os detalhes do Naara Higienópolis.</p>
+                                   </div>
+                               </li>
+                           </ul>
+                        </div>
+                    </div>
+                    <div id="day-2-content" class="timeline-content">
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                           <h3 class="font-bold text-xl brand-primary mb-4">Amplificação e Engajamento</h3>
+                           <ul class="space-y-4">
+                               <li class="flex items-start">
+                                   <span class="icon-symbol brand-accent-text mr-4 mt-1">▶️</span>
+                                   <div>
+                                       <h4 class="font-semibold">Impulsionamento dos Cortes Digitais</h4>
+                                       <p class="text-gray-600">Cortes de até 1 minuto da participação na TV são impulsionados no YouTube e Instagram, com CTA para a matéria no portal.</p>
+                                   </div>
+                               </li>
+                               <li class="flex items-start">
+                                   <span class="icon-symbol brand-accent-text mr-4 mt-1">🖱️</span>
+                                   <div>
+                                       <h4 class="font-semibold">Veiculação de Displays</h4>
+                                       <p class="text-gray-600">Banners são veiculados na home e editorias do portal BM&C News, gerando tráfego contínuo e qualificado para a matéria principal.</p>
+                                   </div>
+                               </li>
+                           </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="section-title">O Impacto: Entregáveis</h2>
+                <p class="section-subtitle">
+                    Cada peça desta campanha foi pensada para maximizar o alcance e a credibilidade, compondo um ecossistema de conteúdo coeso e de alto impacto.
+                </p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="icon-symbol brand-primary mb-4">📺</div>
+                        <h3 class="font-bold text-xl mb-2 brand-primary">Participação em Bancada</h3>
+                        <p class="text-gray-600">Posicionamento de Marcelo Nudelman como autoridade no principal telejornal da BM&C News.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="icon-symbol brand-primary mb-4">📰</div>
+                        <h3 class="font-bold text-xl mb-2 brand-primary">Matéria no Portal</h3>
+                        <p class="text-gray-600">Conteúdo aprofundado que serve como pilar central da campanha, detalhando o Naara Higienópolis.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="icon-symbol brand-primary mb-4">▶️</div>
+                        <h3 class="font-bold text-xl mb-2 brand-primary">Cortes Digitais</h3>
+                        <p class="text-gray-600">Pílulas de vídeo para alcance massivo e direcionado em YouTube e Instagram, gerando tráfego qualificado.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="icon-symbol brand-primary mb-4">🖱️</div>
+                        <h3 class="font-bold text-xl mb-2 brand-primary">Displays no Portal</h3>
+                        <p class="text-gray-600">Exposição contínua para a audiência do portal, reforçando a mensagem e direcionando para a matéria.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="investment" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="section-title">O Investimento</h2>
+                 <p class="section-subtitle">
+                    Uma proposta de valor única, que engloba todas as frentes de produção e veiculação em um pacote estratégico e otimizado.
+                 </p>
+                 <div class="chart-container">
+                    <canvas id="investmentChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="next-steps" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="section-title">Próximos Passos</h2>
+                <p class="section-subtitle">
+                    Acreditamos que este formato conciso é ideal para gerar um impacto significativo para o Naara Higienópolis. Estamos prontos para dar o próximo passo.
+                </p>
+                <a href="https://wa.me/5511942500087" target="_blank" rel="noopener noreferrer" class="inline-block bg-brand-primary text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:bg-opacity-90 transition-all transform hover:scale-105">
+                    Agendar Reunião
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 BM&C News. Todos os direitos reservados.</p>
+            <p class="text-sm text-gray-400 mt-2">Proposta confidencial para Think Construtora.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const timelineControls = document.getElementById('timeline-controls');
+            const timelineItems = timelineControls.querySelectorAll('.timeline-item');
+            const timelineDetails = document.getElementById('timeline-details');
+            const allContent = timelineDetails.querySelectorAll('.timeline-content');
+
+            timelineControls.addEventListener('click', function(e) {
+                const targetControl = e.target.closest('.timeline-item');
+                if (!targetControl) return;
+
+                const day = targetControl.dataset.day;
+                const contentToShow = document.getElementById(`day-${day}-content`);
+
+                timelineItems.forEach(item => item.classList.remove('active'));
+                targetControl.classList.add('active');
+
+                allContent.forEach(content => {
+                    if (content.id === `day-${day}-content`) {
+                        content.classList.add('show');
+                    } else {
+                        content.classList.remove('show');
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            const investmentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pacote Completo da Campanha'],
+                    datasets: [{
+                        label: 'Investimento',
+                        data: [50000],
+                        backgroundColor: [
+                            '#3D5A80',
+                        ],
+                        borderColor: [
+                            '#F8F7F4'
+                        ],
+                        borderWidth: 5,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Investimento Total',
+                            position: 'bottom',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#4A4A4A',
+                            padding: { top: 20 }
+                        }
+                    },
+                    elements: {
+                        center: {
+                            text: 'R$ 50.000',
+                            color: '#3D5A80', 
+                            fontStyle: 'bold', 
+                            sidePadding: 20, 
+                            minFontSize: 20, 
+                            lineHeight: 25 
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'doughnut-center-text',
+                    beforeDraw: function(chart) {
+                        if (chart.options.elements.center) {
+                            var ctx = chart.ctx;
+                            var centerConfig = chart.options.elements.center;
+                            var fontStyle = centerConfig.fontStyle || 'Arial';
+                            var txt = centerConfig.text;
+                            var color = centerConfig.color || '#000';
+                            var maxFontSize = centerConfig.maxFontSize || 75;
+                            var minFontSize = centerConfig.minFontSize || 20;
+                            var sidePadding = centerConfig.sidePadding || 20;
+                            var sidePaddingCalculated = (sidePadding / 100) * (chart.innerRadius * 2)
+                            ctx.font = "30px " + fontStyle;
+                            var stringWidth = ctx.measureText(txt).width;
+                            var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
+                            var widthRatio = elementWidth / stringWidth;
+                            var newFontSize = Math.floor(30 * widthRatio);
+                            var elementHeight = (chart.innerRadius * 2);
+                            var fontSizeToUse = Math.min(newFontSize, elementHeight, maxFontSize);
+                            if (fontSizeToUse < minFontSize) {
+                                fontSizeToUse = minFontSize;
+                            }
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            var centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+                            var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+                            ctx.font = fontSizeToUse + "px " + fontStyle;
+                            ctx.fillStyle = color;
+                            ctx.fillText(txt, centerX, centerY);
+                        }
+                    }
+                }]
+            });
+        });
+    </script>
+</body>
+</html>
