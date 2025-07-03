@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Código de Propostas</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for better user experience */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Gerador de Código Aleatório</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Clique no botão para gerar um código único de 15 caracteres.</p>
+        </div>
+
+        <!-- Code Display Area -->
+        <div class="mb-6">
+            <div id="code-display" class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center text-2xl md:text-3xl font-mono tracking-wider text-gray-900 dark:text-white h-20 flex items-center justify-center transition-all">
+                <span id="placeholder-text" class="text-gray-500 dark:text-gray-400">Seu código aparecerá aqui...</span>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mb-8">
+            <button id="generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800">
+                Gerar Novo Código
+            </button>
+        </div>
+
+        <!-- History Section -->
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Códigos Gerados</h2>
+            <div id="history-list" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 h-48 overflow-y-auto">
+                <!-- Generated codes will be added here -->
+                <p id="history-placeholder" class="text-gray-500 dark:text-gray-400">Nenhum código foi gerado ainda.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM element references
+        const generateBtn = document.getElementById('generate-btn');
+        const codeDisplay = document.getElementById('code-display');
+        const historyList = document.getElementById('history-list');
+        const placeholderText = document.getElementById('placeholder-text');
+        const historyPlaceholder = document.getElementById('history-placeholder');
+
+        // Character set for code generation
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const codeLength = 15;
+
+        // Use a Set to store generated codes for efficient uniqueness checks
+        const generatedCodes = new Set();
+
+        /**
+         * Generates a single random string of a specified length.
+         * @returns {string} The randomly generated string.
+         */
+        function generateRandomString() {
+            let result = '';
+            for (let i = 0; i < codeLength; i++) {
+                const randomIndex = Math.floor(Math.random() * chars.length);
+                result += chars.charAt(randomIndex);
+            }
+            return result;
+        }
+
+        /**
+         * Generates a unique random string, ensuring it hasn't been generated before.
+         * @returns {string|null} A unique string, or null if it's impossible to generate a new one (highly unlikely).
+         */
+        function generateUniqueCode() {
+            // Safety break to prevent infinite loops in the extremely unlikely event all combinations are used.
+            const maxAttempts = 100; 
+            let attempts = 0;
+
+            while (attempts < maxAttempts) {
+                const newCode = generateRandomString();
+                if (!generatedCodes.has(newCode)) {
+                    generatedCodes.add(newCode);
+                    return newCode;
+                }
+                attempts++;
+            }
+            
+            // This part is almost impossible to reach with 15 characters
+            console.error("Não foi possível gerar um código único após várias tentativas.");
+            alert("Erro: Não foi possível gerar um código único. O espaço de combinações pode estar esgotado.");
+            return null;
+        }
+
+        /**
+         * Updates the UI with the newly generated code.
+         * @param {string} code The code to display.
+         */
+        function updateUI(code) {
+            // Update main display
+            if (placeholderText) {
+                placeholderText.remove();
+            }
+            codeDisplay.textContent = code;
+
+            // Update history list
+            if (historyPlaceholder) {
+                historyPlaceholder.remove();
+            }
+            
+            const historyItem = document.createElement('div');
+            historyItem.textContent = code;
+            historyItem.className = 'p-2 bg-white dark:bg-gray-600 rounded mb-2 font-mono text-sm';
+            historyList.prepend(historyItem); // Add new codes to the top
+        }
+
+        // Event listener for the button click
+        generateBtn.addEventListener('click', () => {
+            const newCode = generateUniqueCode();
+            if (newCode) {
+                updateUI(newCode);
+            }
+        });
+    </script>
+
+</body>
+</html>
