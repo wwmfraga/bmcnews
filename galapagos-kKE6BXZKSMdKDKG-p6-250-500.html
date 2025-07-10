@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta Interativa | BM&C News + Galápagos Capital</title>
+    <!-- Chosen Palette: Warm Neutrals with Blue Accent -->
+    <!-- Application Structure Plan: A dashboard-style comparison tool. A main selector toggles between two investment plans ("Essencial" and "Estratégico"). This action dynamically updates all key components on the page: a summary card with total investment/duration, a doughnut chart visualizing the cost breakdown, a detailed grid of deliverables, and a visual timeline. This structure was chosen to transform a static proposal into an interactive decision-making tool, allowing for direct, side-by-side comparison of the options in a visually engaging and easy-to-understand format, rather than requiring the user to read through separate text blocks. -->
+    <!-- Visualization & Content Choices: Plan Data -> Goal: Compare -> Viz: Interactive dashboard with toggle, doughnut chart (Chart.js), dynamic cards, and visual timeline. Interaction: A single click on the plan selector updates all visuals and text. Justification: This provides an at-a-glance comparison of costs and benefits, making the value proposition of each plan clearer and more impactful. The chart visualizes the financial commitment, while the dynamic cards and timeline detail the deliverables over time. This is more effective for comparison than a linear document. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .plan-button.active {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+        }
+        .plan-button {
+            transition: all 0.3s ease;
+        }
+        .card-enter {
+            animation: card-enter 0.5s ease-out forwards;
+        }
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-2">Proposta de Parceria Estratégica</h1>
+            <p class="text-lg text-gray-600">BM&C News + Galápagos Capital</p>
+        </header>
+
+        <section id="intro" class="mb-12 max-w-4xl mx-auto text-center">
+            <h2 class="text-2xl font-bold mb-4">A Oportunidade: Construção de Autoridade no Mercado Financeiro</h2>
+            <p class="text-gray-700 leading-relaxed">
+                Esta proposta detalha uma solução editorial completa para posicionar a Galápagos Capital como uma voz de autoridade perante uma audiência qualificada de investidores. Através de uma presença estratégica nos momentos mais cruciais do dia de negociação, transformamos a expertise da sua equipe em uma narrativa de confiança e credibilidade. Explore abaixo os dois planos desenhados para atingir seus objetivos, alternando entre as opções para comparar os benefícios e o escopo de cada um.
+            </p>
+        </section>
+        
+        <section id="plan-selector" class="mb-10 flex justify-center">
+            <div class="flex space-x-2 bg-gray-200 p-1 rounded-xl">
+                <button id="btn-plan1" class="plan-button w-40 sm:w-48 py-2 px-4 rounded-lg font-semibold text-gray-700 focus:outline-none">
+                    Plano Essencial
+                </button>
+                <button id="btn-plan2" class="plan-button w-40 sm:w-48 py-2 px-4 rounded-lg font-semibold text-gray-700 focus:outline-none">
+                    Plano Estratégico
+                </button>
+            </div>
+        </section>
+
+        <main id="dashboard" class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-8">
+                <div id="summary" class="bg-white p-6 rounded-2xl shadow-lg card-enter">
+                     <h3 class="text-lg font-bold mb-4 text-gray-500 text-center">Resumo do Investimento</h3>
+                     <div class="flex justify-around text-center">
+                        <div>
+                            <p class="text-sm text-gray-500">Duração</p>
+                            <p id="duration" class="text-2xl md:text-3xl font-bold text-blue-600"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Investimento Total</p>
+                            <p id="investment" class="text-2xl md:text-3xl font-bold text-blue-600"></p>
+                        </div>
+                     </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg card-enter">
+                    <h3 class="text-lg font-bold mb-4 text-center text-gray-500">Distribuição do Investimento</h3>
+                    <div class="chart-container">
+                        <canvas id="investmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg card-enter">
+                <h3 class="text-xl font-bold mb-6 text-gray-700">Entregáveis Detalhados</h3>
+                <div id="deliverables" class="space-y-6">
+                </div>
+            </div>
+
+        </main>
+
+        <section id="timeline-section" class="mt-12 bg-white p-6 sm:p-8 rounded-2xl shadow-lg card-enter">
+            <h2 class="text-2xl font-bold text-center mb-8">Cronograma de Ações Proposto</h2>
+            <div id="timeline" class="relative pl-8 border-l-2 border-blue-200">
+            </div>
+        </section>
+        
+         <section id="value-prop" class="mt-12 max-w-4xl mx-auto text-left">
+            <h2 class="text-2xl font-bold mb-6 text-center">Nossos Diferenciais Estratégicos</h2>
+            <div class="space-y-4 text-gray-700 leading-relaxed bg-white p-6 rounded-2xl shadow-lg">
+                <p><strong>✓ Análise e Sinergia de Produtos:</strong> Em nossos programas, os especialistas da Galápagos terão a oportunidade única de contextualizar os movimentos do mercado e, de forma orgânica, conectar essas análises ao seu portfólio (GCRI11, GCRA11, Multimercado, etc.), educando a audiência sobre o valor e a tese por trás de cada estratégia.</p>
+                <p><strong>✓ Autoridade e Frequência:</strong> A presença recorrente nos programas Pré-Marketing e Closing, somada ao patrocínio com vinhetas, solidifica a Galápagos como uma marca de referência no dia a dia do investidor, construindo reconhecimento e autoridade de forma consistente.</p>
+                <p><strong>✓ Liderança em Destaque:</strong> Entrevistas exclusivas nos programas BM&C Business e Mercado & Beyond, além da cobertura de eventos, posicionam os líderes da Galápagos como protagonistas do setor, humanizando a marca e aprofundando a conexão com o público.</p>
+                <p><strong>✓ Distribuição Digital Inteligente:</strong> Todo conteúdo editorial produzido é transformado em "cortes digitais" e distribuído em campanhas estratégicas. Com entrega de audiência garantida, amplificamos exponencialmente o alcance da mensagem, impactando diferentes perfis de investidores de acordo com o contexto de cada produto.</p>
+            </div>
+        </section>
+        
+        <footer class="text-center mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-xl font-semibold">Próximos Passos</h3>
+            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Acreditamos que este projeto é o caminho mais eficaz para atingir seus objetivos de negócio. Estamos à disposição para agendar uma reunião e discutir como podemos customizar esta proposta para atender às suas metas.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const plan1Data = {
+                name: 'Plano Essencial',
+                duration: '4 Semanas',
+                investment: 'R$ 250.000',
+                investmentValue: 250000,
+                chartData: {
+                    labels: ['Programas (Pré & Closing)', 'BM&C Business', 'Cobertura de Evento', 'Conteúdo Digital', 'Mídia Avulsa'],
+                    data: [80000, 40000, 50000, 50000, 30000],
+                },
+                deliverables: [
+                    { icon: '🎙️', title: 'Programas Pré-Marketing & Closing', quantity: '8 edições', description: 'Presença estratégica com análises e vinhetas nos programas de abertura e fechamento de mercado.' },
+                    { icon: '👔', title: 'Programa BM&C Business', quantity: '1 edição', description: 'Entrevista exclusiva de 60 minutos com a liderança da Galápagos para aprofundar teses e visão de mercado.' },
+                    { icon: '📸', title: 'Cobertura de Evento', quantity: '1 cobertura', description: 'Destaque jornalístico para a participação da marca em um evento relevante do setor em São Paulo.' },
+                    { icon: '💻', title: 'Conteúdo Digital Garantido', quantity: '4 semanas', description: 'Amplificação dos melhores momentos e mensagens-chave com entrega de audiência garantida.' },
+                    { icon: '📺', title: 'Mídia Avulsa', quantity: '4 semanas', description: 'Inserções comerciais de 30" para reforçar a campanha e os produtos durante a programação.' }
+                ],
+                timeline: [
+                    { period: 'Semana 1', action: 'Kick-off, alinhamento editorial, 1ª participação no Pré-Marketing & Closing e início dos conteúdos digitais.' },
+                    { period: 'Semana 2', action: '2ª participação no Pré-Marketing & Closing e gravação da entrevista para o BM&C Business.' },
+                    { period: 'Semana 3', action: '3ª participação, com publicação e distribuição da entrevista no BM&C Business.' },
+                    { period: 'Semana 4', action: '4ª participação, realização da Cobertura de Evento e entrega do relatório final de resultados.' },
+                ]
+            };
+
+            const plan2Data = {
+                name: 'Plano Estratégico',
+                duration: '12 Semanas',
+                investment: 'R$ 500.000',
+                investmentValue: 500000,
+                chartData: {
+                    labels: ['Programas (Pré & Closing)', 'Programas Especiais', 'Conteúdo Digital', 'Mídia Avulsa'],
+                    data: [200000, 70000, 150000, 80000],
+                },
+                deliverables: [
+                    { icon: '🎙️', title: 'Programas Pré-Marketing & Closing', quantity: '24 edições', description: 'Presença contínua para construir o hábito na audiência e solidificar a autoridade da marca.' },
+                    { icon: '🌟', title: 'Programas Especiais: BM&C Business + Mercado & Beyond', quantity: '2 edições', description: 'Duas entrevistas com abordagens distintas: uma focada em negócios e outra no lado humano e inspirador da liderança.' },
+                    { icon: '🎁', title: 'Cobertura de Evento Bonificada', quantity: '1 cobertura', description: 'Destaque para a participação da marca em um evento relevante, oferecida como bônus do plano.' },
+                    { icon: '💻', title: 'Conteúdo Digital Garantido', quantity: '12 semanas', description: 'Amplificação contínua para garantir alcance, frequência e conversão ao longo de todo o período.' },
+                    { icon: '📺', title: 'Mídia Avulsa', quantity: '12 semanas', description: 'Presença constante na programação para fortalecer o branding e divulgar o portfólio.' }
+                ],
+                 timeline: [
+                    { period: 'Mês 1', action: 'Kick-off, planejamento trimestral, início das participações semanais no Pré-Marketing & Closing e da campanha digital.' },
+                    { period: 'Mês 2', action: 'Continuidade das participações, gravação e veiculação dos programas especiais (BM&C Business e Mercado & Beyond).' },
+                    { period: 'Mês 3', action: 'Continuidade das participações, realização da Cobertura de Evento, otimização da campanha digital e relatório final de resultados.' },
+                ]
+            };
+
+            const durationEl = document.getElementById('duration');
+            const investmentEl = document.getElementById('investment');
+            const deliverablesEl = document.getElementById('deliverables');
+            const timelineEl = document.getElementById('timeline');
+            
+            const btnPlan1 = document.getElementById('btn-plan1');
+            const btnPlan2 = document.getElementById('btn-plan2');
+
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            let investmentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#2563eb', '#60a5fa', '#93c5fd', '#bfdbfe', '#e0f2fe'],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                             labels: {
+                                color: '#4b5563',
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'rectRounded'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed) + ` (${percentage}%)`;
+                                    }
+                                    return label;
+                                }
+                            },
+                            backgroundColor: '#1f2937',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 4,
+                            displayColors: false
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            function updateView(plan) {
+                document.querySelectorAll('.card-enter').forEach(el => {
+                    el.classList.remove('card-enter');
+                    void el.offsetWidth;
+                    el.classList.add('card-enter');
+                });
+
+                durationEl.textContent = plan.duration;
+                investmentEl.textContent = plan.investment;
+
+                deliverablesEl.innerHTML = plan.deliverables.map(item => `
+                    <div class="flex items-start space-x-4 p-3 transition-colors duration-200 hover:bg-gray-50 rounded-lg">
+                        <div class="text-3xl pt-1">${item.icon}</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">${item.title} <span class="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${item.quantity}</span></h4>
+                            <p class="text-gray-600 text-sm">${item.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                timelineEl.innerHTML = plan.timeline.map(item => `
+                    <div class="mb-8 relative">
+                         <div class="absolute w-6 h-6 bg-blue-500 rounded-full -left-[45px] top-1 border-4 border-white"></div>
+                         <h4 class="font-bold text-gray-800">${item.period}</h4>
+                         <p class="text-gray-600 text-sm">${item.action}</p>
+                    </div>
+                `).join('');
+                
+                investmentChart.data.labels = plan.chartData.labels;
+                investmentChart.data.datasets[0].data = plan.chartData.data;
+                investmentChart.update();
+            }
+
+            btnPlan1.addEventListener('click', () => {
+                btnPlan1.classList.add('active');
+                btnPlan2.classList.remove('active');
+                updateView(plan1Data);
+            });
+
+            btnPlan2.addEventListener('click', () => {
+                btnPlan2.classList.add('active');
+                btnPlan1.classList.remove('active');
+                updateView(plan2Data);
+            });
+
+            btnPlan1.click();
+        });
+    </script>
+</body>
+</html>
